@@ -1,0 +1,13 @@
+gensim
+nltk
+py2neo
+neo4j
+flask
+watson-developer-cloud
+google-api-core==1.7.0
+google-auth==1.6.2
+google-cloud-core==0.29.1
+google-cloud-storage==1.13.2
+google-resumable-media==0.3.2
+googleapis-common-protos==1.5.5
+newspaper3k
