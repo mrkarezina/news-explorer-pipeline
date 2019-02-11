@@ -13,8 +13,6 @@ class ArticleInserter:
 
         self.graph = Graph(graph_url)
 
-        self.queries_dict = {}
-
         # Minimum entities mentioned in summary
         self.minimum_entities = 0
 
@@ -44,7 +42,7 @@ class ArticleInserter:
             "ARTICLE_TOPICS": """
             MATCH(article:Article {cluster_id:{CLUSTER_ID}, user_id:{USER_ID}, title:{TITLE}})
             
-            MERGE (topic:TOPIC {label: {TOPIC_LABEL}})
+            MERGE (topic:Topic {label: {TOPIC_LABEL}})
             
             MERGE (article)-[r:HAS_TOPIC]->(topic)
             SET r.score = {RELEVANCE_SCORE}
@@ -84,8 +82,8 @@ class ArticleInserter:
         # Replace for actual ids
         for query in self.queries_dict.keys():
             q = self.queries_dict[query]
-            q = q.replace("{CLUSTER_ID}", "\"" + str(cluster_id) + "\"")
-            q = q.replace("{USER_ID}", "\"" + str(user_id) + "\"")
+            q = q.replace("{CLUSTER_ID}", "\"{0}\"".format(cluster_id))
+            q = q.replace("{USER_ID}", "\"{0}\"".format(user_id))
 
             self.queries_dict[query] = q
 

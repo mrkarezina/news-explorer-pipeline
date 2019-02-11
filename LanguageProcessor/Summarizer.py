@@ -40,7 +40,8 @@ class Summarizer(LanguageProcessor):
         # Tokens that indicate sentence should not be in summary
         self.non_body_sentence_blacklist = ["Twitter\n", "Facebook\n", "Instagram\n", "Getty Images", "\n"]
 
-        self.text = text
+        # Remove bad characters causing summary to fail
+        self.text = text.encode("ascii", errors="ignore").decode()
 
         self.include_intro = include_intro
 
@@ -134,7 +135,7 @@ class Summarizer(LanguageProcessor):
 
         self.parse()
 
-        max_attempts = 60
+        max_attempts = 1000
 
         summary_factor = 0.6
 

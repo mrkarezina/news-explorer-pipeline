@@ -54,14 +54,10 @@ def process_text(text):
 
         keywords = keywords + phrases
 
-        intro = summarizer.intro
     except SummaryException:
         summary = [""]
-        intro = [""]
-
         is_valid = False
 
-    summary = intro + summary
     summary = " ".join(summary)
 
     return is_valid, summary, keywords
@@ -98,8 +94,8 @@ def process_language(request):
     except KeyError:
         return 'Bad params'
 
-    if len(text.split()) > 10000:
-        return 'To many tokens, max 10000'
+    if len(text.split()) > 12000:
+        return 'To many tokens, max 12000'
 
     is_valid, summary, keywords = process_text(text)
 

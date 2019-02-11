@@ -47,8 +47,9 @@ def process_language(text):
     :return:
     """
 
+    # The language processing seems to fail without acsii decoding, ie remove emoji and chinese characters
     request = {
-        'text': text
+        'text': text.encode("ascii", errors="ignore").decode()
     }
 
     response = requests.post("https://us-central1-graph-intelligence.cloudfunctions.net/language-processor",
@@ -65,12 +66,25 @@ def article_processor(url):
         Returns dict containing enritched entites dict, document embedding, and summary
     """
 
+    is_valid = True
+
     article_dict = fetch_article(url)
+    enriched_knowledge = {}
 
-    processed_language = process_language(article_dict['text'])
-    enriched_knowledge = watson_enricher(article_dict['text'])
+    try:
+        if len(article_dict['text'].split()) < 100:
+            is_valid = False
 
-    article_dict['summary'] = processed_language['summary']
-    article_dict['embedding'] = processed_language['embedding']
+        processed_language = process_language(article_dict['text'])
+        enriched_knowledge = watson_enricher(article_dict['text'])
 
-    return article_dict, enriched_knowledge
+        article_dict['summary'] = processed_language['summary']
+        article_dict['embedding'] = processed_language['embedding']
+    except Exception as e:
+        print(e)
+        is_valid = False
+
+    if not is_valid:
+        print("Failed processing URL: {0}".format(url))
+
+    return article_dict, enriched_knowledge, is_valid
