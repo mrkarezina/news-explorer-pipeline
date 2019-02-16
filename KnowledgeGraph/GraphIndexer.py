@@ -19,7 +19,7 @@ class GraphIndexer:
         # Cosine similarity to add to prospective articles
         self.cosine_thresh = 0.4 * self.relation_values["doc2vec"]
 
-        self.num_related = 3
+        self.num_related = 6
 
         # TODO: Make use of the relevancy score
         # TODO: Delete unused properties
@@ -30,6 +30,10 @@ class GraphIndexer:
         """
 
         self.queries_dict = {
+
+            # TODO: totals count is not working
+            # TODO: {ENTITY_WEIGHT}*overlap_ent/(a.total_entity + 1) + ({ENT not working
+
             # Used set totals as property to prevent recomputing
             # If this is used article by article, when comuting bidirectional relation will fail silently if other article not having totals property
             "SET_PROPERTIES_COUNT": """
@@ -40,13 +44,14 @@ class GraphIndexer:
                                     WHERE e.type <> 'Location'
                                     
                                     OPTIONAL MATCH (a)-[:RELATED_ENTITY]->(e)-[:IN_CATEGORY]->(e_cat:Category)
-                                    OPTIONAL MATCH (a)-[:MENTIONS_CONCEPT]->(c:Concept)
+                                    OPTIONAL MATCH (a)-[:MENTIONS_CONCEPT]->(con:Concept)
                                     
-                                    WITH a, count(distinct e) as ent, count(distinct e_cat) as cat, count(distinct c) as con
+                                    WITH a, count(distinct e) as ent, count(distinct e_cat) as cat, count(distinct con) as con
                                     SET a.total_entity = ent
                                     SET a.total_category = cat
                                     SET a.total_concept = con
                                     """,
+
 
             # Creates semantic weight based on common concepts, entities, and entity categories
             "CREATE_SEMANTIC_RELATIONS": """
@@ -60,6 +65,10 @@ class GraphIndexer:
                                                 OPTIONAL MATCH (a)-[:RELATED_ENTITY]->(e1:Entity)-[:IN_CATEGORY]->(e_cat:Category)<-[:IN_CATEGORY]-(e2:Entity)<-[:RELATED_ENTITY]-(b)
                                                 WHERE e1 <> e2
                                                 WITH a, r, overlap_ent, overlap_con, count(distinct e_cat) as overlap_cat
+                                                
+                                                SET r.ent = overlap_ent
+                                                SET r.cat = overlap_cat
+                                                SET r.con = overlap_con
 
                                                 SET r.semantic_weight = {ENTITY_WEIGHT}*overlap_ent/(a.total_entity + 1) + ({ENTITY_CATEGORY_WEIGHT}*overlap_cat)/(a.total_category+1) + ({CONCEPT_WEIGHT}*overlap_con)/(a.total_concept+1)
                                                 """,
@@ -68,7 +77,7 @@ class GraphIndexer:
             "CREATE_COSINE_SIMILARITY_RELATIONS": """
                                             MATCH (a: Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}, title:{TITLE}})
                                             MATCH (b: Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}})
-                                            WHERE NOT EXISTS((a)-[:SIMILARITY]->(b))
+                                            WHERE NOT EXISTS((a)-[:SIMILARITY]->(b)) AND a <> b
 
                                             WITH a, b, apoc.algo.cosineSimilarity(a.embedding, b.embedding) as similarity
 
@@ -97,8 +106,8 @@ class GraphIndexer:
             "GET_MOST_SIMILAR": """
                                         MATCH(a:Article {title:{TITLE}, cluster_id:{CLUSTER_ID}, user_id:{USER_ID}})
                                         MATCH (a)-[r1:SIMILARITY]->(related:Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}})
-                                        WHERE a <> related AND exists(r1.semantic_weight)
-                                        RETURN related, r1.semantic_weight as weight
+                                        WHERE a <> related AND exists(r1.cosine_weight)
+                                        RETURN related, r1.cosine_weight as weight
                                         ORDER BY weight DESC
                                         LIMIT {NUM_RELATED}
                                         """,
@@ -147,7 +156,6 @@ class GraphIndexer:
         print(cosine_prospective)
 
         prospective_articles = set(cosine_prospective + prospective_articles)
-        prospective_articles.remove(title)
         print("Prospective Articles: {0}".format(len(prospective_articles)))
 
         # Creates full relations between unique articles returned
