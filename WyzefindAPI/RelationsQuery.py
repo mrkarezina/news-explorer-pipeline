@@ -4,10 +4,10 @@ from py2neo import Graph
 graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
 
 
-class GraphQuery:
+class RelationsQuery:
     """
-    Used to query content graph:
-    -Find / Explain related articles
+    Used to query relations between articles in the graph
+    -Find / Explain relation between articles
     -Find me a path query
     """
 
@@ -70,10 +70,6 @@ class GraphQuery:
                 """
 
         }
-
-        self.CREATE_UNIQUE_CONSTRAINT = """
-        CREATE CONSTRAINT ON (a:Article) ASSERT a.title IS UNIQUE
-        """
 
         self.format_queries(db_ids)
 
@@ -148,7 +144,7 @@ class GraphQuery:
                 'relation': category[1]['label']
             })
 
-        # For finding common conceptsgit commit -am  "DuckDuckGo and Clustering"
+        # For finding common concepts
         concepts = list(self.graph.run(self.queries_dict["EXPLAIN_CONCEPT_RELATION"],
                                        INITIAL=initial,
                                        TARGET=target))
@@ -168,7 +164,7 @@ if __name__ == "__main__":
         'user_id': 1
     }
 
-    s = GraphQuery(db_ids)
+    s = RelationsQuery(db_ids)
     s.explain_relation("Facebook acquires visual search startup GrokStyle",
                        "Data is not the new oil")
 
