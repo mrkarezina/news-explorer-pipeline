@@ -1,8 +1,8 @@
 import json
 from py2neo import Graph
 
+# graph_url = "http://neo4j:Trebinje66@35.192.106.37:7474/db/data/"
 graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
-
 
 class ArticleInserter:
     """
@@ -26,9 +26,10 @@ class ArticleInserter:
             "RELATED_ENTITY_INSERTION_QUERY": """
                 MATCH(article:Article {cluster_id:{CLUSTER_ID}, user_id:{USER_ID}, title:{TITLE}})
 
-                MERGE (entity:Entity {label: {ENTITY_LABEL}, type: {ENTITY_TYPE}})
+                MERGE (entity:Entity {label: {ENTITY_LABEL}})
 
                 MERGE (article)-[r:RELATED_ENTITY]->(entity)
+                SET r.type = {ENTITY_TYPE}
                 SET r.count = {COUNT}
                 SET r.score = {RELEVANCE}
                 SET r.sentiment = {SENTIMENT}

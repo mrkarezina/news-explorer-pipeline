@@ -4,7 +4,13 @@ from neo4j.exceptions import ConstraintError
 from py2neo import ClientError
 import time
 
+# TODO: change in index / insert files
+# graph_url = "http://neo4j:Trebinje66@35.192.121.170:7474/db/data/"
 graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
+
+# Becuase of weird connection to Neo4j
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 db_ids = {
     'cluster_id': 1,
@@ -24,6 +30,8 @@ def process_article(request):
 
     # try:
     article_dict, watson_entities, is_valid = article_processor(url=url)
+    print(article_dict)
+
     time.sleep(5)
 
     if is_valid:
@@ -39,7 +47,7 @@ def process_article(request):
 
 
 # process_article({
-#     'url': 'https://www.technologyreview.com/s/609223/robots-arent-as-smart-as-you-think/'
+#     'url': 'https://www.health.harvard.edu/blog/scary-news-about-childhood-obesity-2018030613439'
 # })
 
 def load_articles(file):

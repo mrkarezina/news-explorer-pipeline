@@ -1,7 +1,7 @@
 import json
 from py2neo import Graph
 
-graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
+graph_url = "http://neo4j:Trebinje66@35.192.221.56:7474/db/data/"
 
 
 class RelationsQuery:
@@ -130,7 +130,6 @@ class RelationsQuery:
             entity = list(entity)[0]
             explanation['entities'].append({
                 'label': entity['label'],
-                'type': entity['type']
             })
 
         # For finding entities related by meta categories
@@ -144,6 +143,9 @@ class RelationsQuery:
                 'relation': category[1]['label']
             })
 
+        # To remove duplicates produced in how the paths are matched, and only use top 5
+        explanation['entity_categories'] = [dict(t) for t in {tuple(d.items()) for d in explanation['entity_categories']}][:5]
+
         # For finding common concepts
         concepts = list(self.graph.run(self.queries_dict["EXPLAIN_CONCEPT_RELATION"],
                                        INITIAL=initial,
@@ -154,22 +156,21 @@ class RelationsQuery:
                 'label': concept['label'],
             })
 
-        a = json.dumps(explanation, indent=2)
-        print(a)
+        return explanation
 
 
-if __name__ == "__main__":
-    db_ids = {
-        'cluster_id': 1,
-        'user_id': 1
-    }
-
-    s = RelationsQuery(db_ids)
-    s.explain_relation("Facebook acquires visual search startup GrokStyle",
-                       "Data is not the new oil")
-
-    s.get_path("AI Weekly: The AI research agenda for the next 20 years is being made now",
-               "To support founders’ emotional health, VCs must change how they invest", 5)
-    # s.run_graph_analysis()
-
-    # s.test_similarity()
+# if __name__ == "__main__":
+#     db_ids = {
+#         'cluster_id': 1,
+#         'user_id': 1
+#     }
+#
+#     s = RelationsQuery(db_ids)
+#     s.explain_relation("Facebook acquires visual search startup GrokStyle",
+#                        "Data is not the new oil")
+#
+#     s.get_path("AI Weekly: The AI research agenda for the next 20 years is being made now",
+#                "To support founders’ emotional health, VCs must change how they invest", 5)
+#     # s.run_graph_analysis()
+#
+#     # s.test_similarity()

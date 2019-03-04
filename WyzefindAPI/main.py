@@ -4,6 +4,7 @@ import json, requests
 
 from ArticleProcessor import article_processor
 from GraphFulfilment import GraphFulfilment
+from RelationsQuery import RelationsQuery
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -20,9 +21,10 @@ Server for Wyzefind API:
 # TODO: Change TOPIC to Topic in cypher
 
 db_ids = {
-        'cluster_id': 1,
-        'user_id': 1
-    }
+    'cluster_id': 1,
+    'user_id': 1
+}
+
 
 @app.route('/', methods=['POST'])
 def get_related_articles():
@@ -71,8 +73,62 @@ def get_related_articles():
     for related in most_related:
         related_articles['related'].append(graph.get_article_data(related))
 
-    print(json.dumps(related_articles, indent=2))
+    response = app.response_class(
+        response=json.dumps(related_articles),
+        status=200,
+        mimetype='application/json'
+    )
 
+    return response
+
+
+@app.route('/explore', methods=['POST'])
+def explore_relations():
+    """
+    Takes a target title in the graph
+    -find the most similar to that title
+    -explains connections from target to related
+    :return:
+    -data on inital title
+    -data and explanation for most related titles
+    """
+
+    data = request.data
+    data_dict = json.loads(data)
+
+    graph = GraphFulfilment(db_ids)
+    relations = RelationsQuery(db_ids)
+
+    try:
+        url = data_dict["article_url"]
+    except (KeyError):
+        response = app.response_class(
+            response='Proper parameter missing',
+            status=400,
+        )
+        return response
+
+    title = graph.get_title_from_url(url)
+
+    article_dict = graph.get_article_data(title)
+    related_articles = {
+        'initial': [{
+            'title': article_dict['title'],
+            'date': article_dict['date'],
+            'url': article_dict['url'],
+            'summary': article_dict['summary'],
+        }],
+        'related': []
+    }
+
+    most_related = graph.get_most_related_articles(title)
+
+    for related in most_related:
+        data = graph.get_article_data(related)
+        data.update(relations.explain_relation(title, related))
+        related_articles['related'].append(data)
+
+    # print(json.dumps(related_articles, indent=2))
     response = app.response_class(
         response=json.dumps(related_articles),
         status=200,
@@ -111,4 +167,4 @@ if __name__ == '__main__':
     #     'article_url': 'https://techcrunch.com/2019/02/18/apple-could-be-looking-for-its-next-big-revenue-model/'
     # })
 
-    app.run(port=5000, debug=True)
+    app.run(port=5001, debug=True)

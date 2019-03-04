@@ -1,7 +1,8 @@
 import json
 from py2neo import Graph
 
-graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
+# graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
+graph_url = "http://neo4j:Trebinje66@35.192.221.56:7474/db/data/"
 
 
 class GraphFulfilment:
@@ -35,6 +36,11 @@ class GraphFulfilment:
                 MATCH (a:Article{title:{TITLE}})
                 RETURN a
                 """,
+
+            "GET_TITLE_FROM_URL": """
+                        MATCH (a:Article{url:{URL}})
+                        RETURN a.title as title
+                        """,
 
             "GET_CONCEPTS": """
                 MATCH (a:Article{title:{TITLE}})
@@ -112,7 +118,6 @@ class GraphFulfilment:
             entity = list(entity)[0]
             article_data['entities'].append({
                 'label': entity['label'],
-                'type': entity['type']
             })
 
         # For finding common concepts
@@ -133,7 +138,7 @@ class GraphFulfilment:
 
         # For finding common concepts
         most_related = list(self.graph.run(self.queries_dict["GET_MOST_RELATED"],
-                                       TITLE=title))
+                                           TITLE=title))
 
         articles = []
         for related in most_related:
@@ -158,20 +163,31 @@ class GraphFulfilment:
 
         return articles
 
+    def get_title_from_url(self, url):
+        """
+        Gets title from url
+        :param url:
+        :return:
+        """
+
+        # For finding common concepts
+        title = list(self.graph.run(self.queries_dict["GET_TITLE_FROM_URL"],
+                                    URL=url))[0]['title']
+
+        return title
 
 
-if __name__ == "__main__":
-    db_ids = {
-        'cluster_id': 1,
-        'user_id': 1
-    }
-
-    s = GraphFulfilment(db_ids)
-    print(s.get_most_related_articles('Facing opposition, Amazon reconsiders N.Y. headquarters site, two officials say'))
-
-    s=s.get_article_data('Facing opposition, Amazon reconsiders N.Y. headquarters site, two officials say')
-    print(s)
-
+# if __name__ == "__main__":
+#     db_ids = {
+#         'cluster_id': 1,
+#         'user_id': 1
+#     }
+#
+#     s = GraphFulfilment(db_ids)
+#     print(s.get_most_related_articles('Facing opposition, Amazon reconsiders N.Y. headquarters site, two officials say'))
+#
+#     s = s.get_article_data('Facing opposition, Amazon reconsiders N.Y. headquarters site, two officials say')
+#     print(s)
 
     # s.run_graph_analysis()
 

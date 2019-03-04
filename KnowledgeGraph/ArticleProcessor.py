@@ -2,6 +2,8 @@ import newspaper
 import requests
 from KnowledgeGraph.WatsonEnrichment import watson_enricher
 
+# Tech processor: language-processor
+language_processor_api = 'https://us-central1-graph-intelligence.cloudfunctions.net/language-processor-health'
 
 def fetch_article(url):
     """
@@ -52,7 +54,7 @@ def process_language(text):
         'text': text.encode("ascii", errors="ignore").decode()
     }
 
-    response = requests.post("https://us-central1-graph-intelligence.cloudfunctions.net/language-processor",
+    response = requests.post(language_processor_api,
                              json=request)
 
     return response.json()

@@ -7,7 +7,7 @@ db_ids = {
         'user_id': 1
     }
 
-natural_language_function = "https://us-central1-graph-intelligence.cloudfunctions.net/language-processor"
+natural_language_function = "https://us-central1-graph-intelligence.cloudfunctions.net/language-processor-health"
 
 
 def fetch_article(url):

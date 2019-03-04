@@ -4,6 +4,14 @@ from watson_developer_cloud.natural_language_understanding_v1 import Features, E
     ConceptsOptions
 
 
+"""
+10000 NLU units a month free
+
+10000 characters is one data unit
+NLU units = data units * number features
+
+"""
+
 def watson_enricher(text):
     """
     Calls IBM watson Natural Langauage understading API to enrich text

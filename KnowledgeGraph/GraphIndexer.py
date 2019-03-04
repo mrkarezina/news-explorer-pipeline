@@ -1,8 +1,8 @@
 from py2neo import Graph
 import threading
 
+# graph_url = "http://neo4j:Trebinje66@35.192.121.170:7474/db/data/"
 graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
-
 
 class GraphIndexer:
     """
@@ -40,8 +40,8 @@ class GraphIndexer:
                                     MATCH (a: Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}, title:{TITLE}})
                                     WHERE not exists(a.total_entity)
                                     
-                                    OPTIONAL MATCH (a)-[:RELATED_ENTITY]->(e:Entity)
-                                    WHERE e.type <> 'Location'
+                                    OPTIONAL MATCH (a)-[r:RELATED_ENTITY]->(e:Entity)
+                                    WHERE r.type <> 'Location'
                                     
                                     OPTIONAL MATCH (a)-[:RELATED_ENTITY]->(e)-[:IN_CATEGORY]->(e_cat:Category)
                                     OPTIONAL MATCH (a)-[:MENTIONS_CONCEPT]->(con:Concept)
@@ -152,8 +152,6 @@ class GraphIndexer:
         # Get prospective articles with matching, entity, category
         prospective_articles = list(self.graph.run(self.queries_dict["MATCH_PROSPECTIVE_ARTICLES"], TITLE=title))[0]['titles']
         cosine_prospective = list(self.graph.run(self.queries_dict["MATCH_COSINE_ARTICLES"], TITLE=title, COSINE_THRESH= self.cosine_thresh))[0]['titles']
-
-        print(cosine_prospective)
 
         prospective_articles = set(cosine_prospective + prospective_articles)
         print("Prospective Articles: {0}".format(len(prospective_articles)))

@@ -17,7 +17,7 @@ storage_client = storage.Client.from_service_account_json(
 
 dataset_bucket = storage_client.get_bucket('gensim-models')
 
-blob = dataset_bucket.blob("tech_doc2vec")
+blob = dataset_bucket.blob("health_doc2vec")
 data = blob.download_as_string()
 model = pickle.loads(data)
 
