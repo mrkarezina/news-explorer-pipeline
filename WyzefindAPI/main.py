@@ -13,26 +13,42 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 """
 Server for Wyzefind API:
 -Analyzes document
--Performs Cypher queries
+-/summary only for summary
+-/summary-related for both summary and most related docmuents
+-/Explore Performs Cypher queries to explain relations
 -
 """
-
-# TODO: Add memcache
-# TODO: Change TOPIC to Topic in cypher
 
 db_ids = {
     'cluster_id': 1,
     'user_id': 1
 }
 
+number_of_related_articles = 3
 
-@app.route('/', methods=['POST'])
+
+def process_article_url(article_url):
+    article_dict, is_valid = article_processor(url=article_url)
+
+    response_articles = {
+        'initial': [{
+            'title': article_dict['title'],
+            'date': article_dict['date'],
+            'url': article_dict['url'],
+            'summary': article_dict['summary'],
+        }],
+        'related': []
+    }
+
+    return response_articles, article_dict, is_valid
+
+
+@app.route('/summary-related', methods=['POST'])
 def get_related_articles():
     """
     Route takes the url of an article
     1. Downloads article
-    2. Finds most similar articles by embedding
-    3. Explain the relation between the most similar article and its most related articles
+    2. Finds most similar articles by embedding and summary
     :return:
     """
 
@@ -43,38 +59,61 @@ def get_related_articles():
 
     try:
         article_url = data_dict["article_url"]
-    except (KeyError):
-        response = app.response_class(
-            response='Proper parameter missing',
-            status=400,
-        )
-        return response
+        response_articles, article_dict, is_valid = process_article_url(article_url)
 
-    article_dict, is_valid = article_processor(url=article_url)
-    if not is_valid:
+    except Exception:
         response = app.response_class(
-            response='Error processing article',
-            status=200,
+            response='Error processing Article',
+            status=500,
         )
         return response
 
     most_related = graph.get_most_related_by_embedding(article_dict['embedding'])
+    most_related = most_related[:number_of_related_articles]
 
-    related_articles = {
-        'initial': [{
-            'title': article_dict['title'],
-            'date': article_dict['date'],
-            'url': article_dict['url'],
-            'summary': article_dict['summary'],
-        }],
-        'related': []
-    }
+    try:
+        # Prevent the same article from being reccomended
+        most_related.remove(article_dict["title"])
+    except ValueError:
+        pass
 
     for related in most_related:
-        related_articles['related'].append(graph.get_article_data(related))
+        response_articles['related'].append(graph.get_article_data(related))
 
     response = app.response_class(
-        response=json.dumps(related_articles),
+        response=json.dumps(response_articles),
+        status=200,
+        mimetype='application/json'
+    )
+
+    return response
+
+
+@app.route('/summary', methods=['POST'])
+def get_article_summary():
+    """
+    Route takes the url of an article
+    1. Downloads article
+    2. Returns a summary
+    :return:
+    """
+
+    data = request.data
+    data_dict = json.loads(data)
+
+    try:
+        article_url = data_dict["article_url"]
+        response_articles, article_dict, is_valid = process_article_url(article_url)
+
+    except Exception:
+        response = app.response_class(
+            response='Error processing Article',
+            status=500,
+        )
+        return response
+
+    response = app.response_class(
+        response=json.dumps(response_articles),
         status=200,
         mimetype='application/json'
     )
@@ -101,17 +140,19 @@ def explore_relations():
 
     try:
         url = data_dict["article_url"]
+
     except (KeyError):
         response = app.response_class(
             response='Proper parameter missing',
-            status=400,
+            status=500,
         )
         return response
 
     title = graph.get_title_from_url(url)
 
     article_dict = graph.get_article_data(title)
-    related_articles = {
+
+    articles_data = {
         'initial': [{
             'title': article_dict['title'],
             'date': article_dict['date'],
@@ -122,31 +163,18 @@ def explore_relations():
     }
 
     most_related = graph.get_most_related_articles(title)
+    most_related = most_related[:number_of_related_articles]
 
     for related in most_related:
         data = graph.get_article_data(related)
         data.update(relations.explain_relation(title, related))
-        related_articles['related'].append(data)
+        articles_data['related'].append(data)
 
     # print(json.dumps(related_articles, indent=2))
     response = app.response_class(
-        response=json.dumps(related_articles),
+        response=json.dumps(articles_data),
         status=200,
         mimetype='application/json'
-    )
-
-    return response
-
-
-@app.route('/', methods=['GET'])
-def nothing_here():
-    """
-    No resource to be returned on GET request
-    :return:
-    """
-
-    response = app.response_class(
-        status=200,
     )
 
     return response

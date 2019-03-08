@@ -22,9 +22,31 @@ wyzefind_api_base_url = 'http://127.0.0.1:5001'
 default_article_img = '...'
 
 
-def format_explore_card(article):
-    relation = 'More on: '
+def processing_error_template():
+    # Give quick choices buttons to redirect to proper error handling block in Chatfuel
 
+    template = {
+        "messages": [
+            {
+                "text": "Sorry, I had trouble analyzing that article. Are you sure that is the URL of a valid article?",
+                "quick_replies": [
+                    {
+                        "title": "Yes",
+                        "block_names": ["Connection Error"]
+                    },
+                    {
+                        "title": "No",
+                        "block_names": ["Article Invalid"]
+                    },
+                ]
+            },
+        ]
+    }
+
+    return template
+
+
+def format_explore_card(article):
     terms = []
     if len(article['entities']) > 0:
         terms.append(article['entities'][0]['label'])
@@ -33,9 +55,10 @@ def format_explore_card(article):
         for concept in article['concepts']:
             terms.append(concept['label'])
 
-    print(terms)
-    terms = relation + ", ".join(terms[:4])
-    print(terms)
+    if len(terms) > 0:
+        terms = 'More on: ' + ", ".join(terms[:4])
+    else:
+        terms = "Related article"
 
     return {
         "title": terms,
@@ -79,7 +102,13 @@ def explore_article_template():
         api_request = {
             "article_url": url
         }
-        api_response = requests.post(wyzefind_api_base_url + '/explore', json=api_request).json()
+        api_response = requests.post(wyzefind_api_base_url + '/explore', json=api_request)
+
+        if api_response.status_code == 500:
+            is_valid = False
+
+        api_response = api_response.json()
+
     except Exception:
         is_valid = False
 
@@ -99,29 +128,16 @@ def explore_article_template():
             ]
         }
 
-    if not is_valid:
-        template = {
-            "messages": [
-                {
-                    "text": "Sorry, I could not process that title."}
-            ]
-        }
-        response = app.response_class(
-            response=json.dumps(template),
-            status=200,
-            mimetype='application/json'
-        )
-
-        return response
-
     else:
-        response = app.response_class(
-            response=json.dumps(template),
-            status=200,
-            mimetype='application/json'
-        )
+        template = processing_error_template()
 
-        return response
+    response = app.response_class(
+        response=json.dumps(template),
+        status=200,
+        mimetype='application/json'
+    )
+
+    return response
 
 
 def format_article_card(article):
@@ -166,8 +182,13 @@ def related_article_template():
         api_request = {
             "article_url": url
         }
-        api_response = requests.post(wyzefind_api_base_url, json=api_request).json()
-        print(api_response)
+        api_response = requests.post(wyzefind_api_base_url + '/summary-related', json=api_request)
+
+        if api_response.status_code == 500:
+            is_valid = False
+
+        api_response = api_response.json()
+
     except Exception:
         is_valid = False
 
@@ -190,62 +211,18 @@ def related_article_template():
             ]
         }
 
-    # # TODO: call API
-    # template = {
-    #     "messages": [
-    #         {
-    #             "attachment": {
-    #                 "type": "template",
-    #                 "payload": {
-    #                     "template_type": "button",
-    #                     "text": title,
-    #                     "buttons": [
-    #                         {
-    #                             "type": "web_url",
-    #                             "url": "https://rockets.chatfuel.com",
-    #                             "title": "Read"
-    #                         },
-    #                         {
-    #                             "set_attributes":
-    #                                 {
-    #                                     "titleToAnalyze": title,
-    #                                 },
-    #                             "block_names": ["Explore Article"],
-    #                             "type": "show_block",
-    #                             "title": "Explore"
-    #                         }
-    #                     ]
-    #                 }
-    #             }
-    #         }
-    #     ]
-    # }
+    else:
+        template = processing_error_template()
 
     print(template)
 
-    if not is_valid:
-        template = {
-            "messages": [
-                {
-                    "text": "Sorry, I could not process that URL."}
-            ]
-        }
-        response = app.response_class(
-            response=json.dumps(template),
-            status=200,
-            mimetype='application/json'
-        )
+    response = app.response_class(
+        response=json.dumps(template),
+        status=200,
+        mimetype='application/json'
+    )
 
-        return response
-
-    else:
-        response = app.response_class(
-            response=json.dumps(template),
-            status=200,
-            mimetype='application/json'
-        )
-
-        return response
+    return response
 
 
 @app.route('/summary', methods=['GET'])
@@ -266,14 +243,19 @@ def summary_template():
         api_request = {
             "article_url": url
         }
-        api_response = requests.post(wyzefind_api_base_url, json=api_request).json()
+
+        api_response = requests.post(wyzefind_api_base_url + '/summary', json=api_request)
+
+        if api_response.status_code == 500:
+            is_valid = False
+
+        api_response = api_response.json()
         initial_article = api_response["initial"][0]
 
     except Exception:
         is_valid = False
 
     if is_valid:
-        # TODO: call API
         template = {
             "messages": [
                 {
@@ -282,30 +264,31 @@ def summary_template():
                     "text": initial_article["summary"]},
             ]
         }
-
-    if not is_valid:
-        template = {
-            "messages": [
-                {
-                    "text": "Sorry, I could not process that URL."}
-            ]
-        }
-        response = app.response_class(
-            response=json.dumps(template),
-            status=200,
-            mimetype='application/json'
-        )
-
-        return response
-
     else:
-        response = app.response_class(
-            response=json.dumps(template),
-            status=200,
-            mimetype='application/json'
-        )
+        template = processing_error_template()
 
-        return response
+    response = app.response_class(
+        response=json.dumps(template),
+        status=200,
+        mimetype='application/json'
+    )
+
+    return response
+
+
+@app.route('/', methods=['GET'])
+def nothing_here():
+    """
+    No resource to be returned on GET request
+    :return:
+    """
+
+    response = app.response_class(
+        response='Hey there, looking for exciting career opportunities? Contact us on vecgraph.com',
+        status=200,
+    )
+
+    return response
 
 
 if __name__ == '__main__':

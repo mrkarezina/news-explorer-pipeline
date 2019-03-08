@@ -7,6 +7,8 @@ db_ids = {
         'user_id': 1
     }
 
+# TODO: Add Google App engine Memcache for this API
+# https://cloud.google.com/appengine/docs/standard/python/memcache/using#configuring_memcache
 natural_language_function = "https://us-central1-graph-intelligence.cloudfunctions.net/language-processor-health"
 
 

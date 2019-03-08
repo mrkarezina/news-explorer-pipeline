@@ -2,7 +2,7 @@ import json
 from py2neo import Graph
 
 # graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
-graph_url = "http://neo4j:Trebinje66@35.192.221.56:7474/db/data/"
+graph_url = "http://neo4j:Trebinje66@35.202.226.197:7474/db/data/"
 
 
 class GraphFulfilment:
@@ -24,12 +24,11 @@ class GraphFulfilment:
 
             "GET_MOST_RELATED_BY_EMBEDDING": """
                 MATCH (a: Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}})
-                
                 WITH a, apoc.algo.cosineSimilarity(a.embedding, {TARGET_EMBEDDING}) as similarity
                 
                 RETURN a.title as title
                 ORDER BY similarity DESC
-                LIMIT 3
+                LIMIT 5
                 """,
 
             "GET_ARTICLE_DATA": """
