@@ -17,9 +17,9 @@ Return the FB messenger template
 :return:
 """
 
-wyzefind_api_base_url = 'http://127.0.0.1:5001'
+wyzefind_api_base_url = 'https://wyzefind-api-dot-graph-intelligence.appspot.com'
 
-default_article_img = '...'
+default_article_img = 'https://img.freepik.com/free-vector/white-rhombus-pattern_1053-249.jpg?size=338&ext=jpg'
 
 
 def processing_error_template():
@@ -95,12 +95,14 @@ def explore_article_template():
     is_valid = True
 
     url = request.args.get('urlToExplore')
+    db_id = request.args.get('db_id')
     if url is None:
         is_valid = False
 
     try:
         api_request = {
-            "article_url": url
+            "article_url": url,
+            "user_id": db_id
         }
         api_response = requests.post(wyzefind_api_base_url + '/explore', json=api_request)
 
@@ -175,13 +177,18 @@ def related_article_template():
     is_valid = True
 
     url = request.args.get('analyzeURL1')
+    db_id = request.args.get('db_id')
     if url is None:
         is_valid = False
 
     try:
         api_request = {
-            "article_url": url
+            "article_url": url,
+            "user_id": db_id
         }
+
+        print(api_request)
+
         api_response = requests.post(wyzefind_api_base_url + '/summary-related', json=api_request)
 
         if api_response.status_code == 500:
@@ -306,4 +313,4 @@ if __name__ == '__main__':
     #     'article_url': 'https://techcrunch.com/2019/02/18/apple-could-be-looking-for-its-next-big-revenue-model/'
     # })
 
-    app.run(port=5000, debug=True)
+    app.run(port=5000, debug=False)

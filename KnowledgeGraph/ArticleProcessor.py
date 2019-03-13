@@ -1,9 +1,34 @@
+from ArticleDownloader import Article
 import newspaper
 import requests
-from KnowledgeGraph.WatsonEnrichment import watson_enricher
+from WatsonEnrichment import watson_enricher
 
 # Tech processor: language-processor
 language_processor_api = 'https://us-central1-graph-intelligence.cloudfunctions.net/language-processor-health'
+
+# If less than 100 tokens retry parsing the article not cleaning dom
+retry_article_parse_tokens = 100
+
+
+def download(url, clean_doc=True):
+    """
+    Tries to download + parse the article using newspaper
+    :param url:
+    :return:
+    """
+
+    article = Article(url)
+    is_valid = True
+
+    try:
+        article.download()
+        article.parse(clean_doc=clean_doc)
+    except newspaper.article.ArticleException:
+        print("Download error")
+        is_valid = False
+
+    return article, is_valid
+
 
 def fetch_article(url):
     """
@@ -12,35 +37,26 @@ def fetch_article(url):
     :return:
     """
 
-    is_valid = True
-
-    try:
-        article = newspaper.Article(url)
-        article.download()
-    except:
-        print("Download error")
-        is_valid = False
+    article, is_valid = download(url)
 
     if is_valid:
-        try:
-            article.parse()
-        except newspaper.article.ArticleException:
-            is_valid = False
 
-        if is_valid:
-            title = article.title
-            text = article.text
-            date = article.publish_date
-            img = article.top_image
+        # Retry downloading article without cleaning
+        if len(article.text.split()) < retry_article_parse_tokens:
+            article, is_valid = download(url, clean_doc=False)
 
-            return {
-                'text': text,
-                'title': title,
-                'date': str(date),
-                'img_url': img,
-                'url': url,
-            }
+        title = article.title
+        text = article.text
+        date = article.publish_date
+        img = article.top_image
 
+        return {
+            'text': text,
+            'title': title,
+            'date': str(date),
+            'img_url': img,
+            'url': url,
+        }
 
 def process_language(text):
     """
@@ -74,14 +90,17 @@ def article_processor(url):
     enriched_knowledge = {}
 
     try:
-        if len(article_dict['text'].split()) < 100:
+        if len(article_dict['text'].split()) > 100:
+
+            processed_language = process_language(article_dict['text'])
+            enriched_knowledge = watson_enricher(article_dict['text'])
+
+            article_dict['summary'] = processed_language['summary']
+            article_dict['embedding'] = processed_language['embedding']
+        else:
+            print('To short article, lenght: {0}'.format(len(article_dict['text'].split())))
             is_valid = False
 
-        processed_language = process_language(article_dict['text'])
-        enriched_knowledge = watson_enricher(article_dict['text'])
-
-        article_dict['summary'] = processed_language['summary']
-        article_dict['embedding'] = processed_language['embedding']
     except Exception as e:
         print(e)
         is_valid = False

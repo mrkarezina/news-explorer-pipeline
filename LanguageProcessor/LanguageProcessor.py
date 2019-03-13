@@ -197,4 +197,3 @@ class LanguageProcessor:
                 return True
             else:
                 return False
-

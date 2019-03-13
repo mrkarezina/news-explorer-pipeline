@@ -12,6 +12,9 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 """
 Server for Wyzefind API:
+-Requires the user_id to identiy the proper graph to query
+-cluster_id is always 1
+
 -Analyzes document
 -/summary only for summary
 -/summary-related for both summary and most related docmuents
@@ -19,12 +22,14 @@ Server for Wyzefind API:
 -
 """
 
-db_ids = {
-    'cluster_id': 1,
-    'user_id': 1
-}
-
 number_of_related_articles = 3
+
+
+def get_db_ids(user_id):
+    return {
+        'cluster_id': 1,
+        'user_id': user_id
+    }
 
 
 def process_article_url(article_url):
@@ -55,11 +60,12 @@ def get_related_articles():
     data = request.data
     data_dict = json.loads(data)
 
-    graph = GraphFulfilment(db_ids)
-
     try:
         article_url = data_dict["article_url"]
         response_articles, article_dict, is_valid = process_article_url(article_url)
+
+        db_ids = get_db_ids(data_dict["user_id"])
+        graph = GraphFulfilment(db_ids)
 
     except Exception:
         response = app.response_class(
@@ -69,6 +75,7 @@ def get_related_articles():
         return response
 
     most_related = graph.get_most_related_by_embedding(article_dict['embedding'])
+
     most_related = most_related[:number_of_related_articles]
 
     try:
@@ -135,11 +142,12 @@ def explore_relations():
     data = request.data
     data_dict = json.loads(data)
 
-    graph = GraphFulfilment(db_ids)
-    relations = RelationsQuery(db_ids)
-
     try:
         url = data_dict["article_url"]
+
+        db_ids = get_db_ids(data_dict["user_id"])
+        graph = GraphFulfilment(db_ids)
+        relations = RelationsQuery(db_ids)
 
     except (KeyError):
         response = app.response_class(
@@ -181,18 +189,9 @@ def explore_relations():
 
 
 if __name__ == '__main__':
-    # Test:
-
-    """
-    curl --header "Content-Type: application/json" \
-  --request POST \
-  --data '{"text":"Our Domestic Bliss is our way of having fun with the audience’s expectations of what they think this doggy doodle doo will be,” Feig told PEOPLE. “It’s a slice of Saturday Evening Post, a dollop of Bad Housekeeping and a generous sprinkling of the Haunted Mansion on top.Without Carter","password":"xyz"}' \
-  https://graph-processing-server-dot-graph-intelligence.appspot.com/infer
-
-    """
 
     # get_related_articles({
     #     'article_url': 'https://techcrunch.com/2019/02/18/apple-could-be-looking-for-its-next-big-revenue-model/'
     # })
 
-    app.run(port=5001, debug=True)
+    app.run(port=5000, debug=False)

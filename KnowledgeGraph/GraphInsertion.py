@@ -1,8 +1,7 @@
-import json
 from py2neo import Graph
 
-# graph_url = "http://neo4j:Trebinje66@35.192.106.37:7474/db/data/"
-graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
+graph_url = "http://neo4j:Trebinje66@35.202.226.197:7474/db/data/"
+# graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
 
 class ArticleInserter:
     """
@@ -96,7 +95,7 @@ class ArticleInserter:
 
         self.graph.run(self.CREATE_UNIQUE_CONSTRAINT)
 
-    def db_insert(self, article_dict, watson_entities):
+    def db_insert(self, article_dict, watson_entities, insert_topics):
         """
         Inserts the extracted information into the knowledge graph
         :param article_dict:
@@ -131,7 +130,8 @@ class ArticleInserter:
                                TITLE=article_dict['title'],
                                CONCEPT_LABEL=category['text'], RELEVANCE_SCORE=category['relevance'])
 
-            for topic in watson_entities['categories']:
-                self.graph.run(self.queries_dict["ARTICLE_TOPICS"],
-                               TITLE=article_dict['title'],
-                               TOPIC_LABEL=topic['label'], RELEVANCE_SCORE=topic['score'])
+            if insert_topics:
+                for topic in watson_entities['categories']:
+                    self.graph.run(self.queries_dict["ARTICLE_TOPICS"],
+                                   TITLE=article_dict['title'],
+                                   TOPIC_LABEL=topic['label'], RELEVANCE_SCORE=topic['score'])

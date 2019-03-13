@@ -96,7 +96,6 @@ class GraphFulfilment:
         :return:
         """
 
-        print(title)
         article = list(self.graph.run(self.queries_dict["GET_ARTICLE_DATA"],
                                       TITLE=title))[0][0]
 

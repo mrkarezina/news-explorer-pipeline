@@ -105,9 +105,6 @@ class RelationsQuery:
 
         articles = articles[0][0]
 
-        for article in articles:
-            print(article['title'])
-
     def explain_relation(self, initial, target):
         """
 

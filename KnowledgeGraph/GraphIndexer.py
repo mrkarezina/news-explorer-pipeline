@@ -1,8 +1,7 @@
 from py2neo import Graph
-import threading
 
-# graph_url = "http://neo4j:Trebinje66@35.192.121.170:7474/db/data/"
-graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
+graph_url = "http://neo4j:Trebinje66@35.202.226.197:7474/db/data/"
+# graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
 
 class GraphIndexer:
     """

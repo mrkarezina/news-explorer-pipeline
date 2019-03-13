@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
     db_ids = {
         'cluster_id': 1,
-        'user_id': 1
+        'user_id': "findhealthtips"
     }
 
     s = SimilarityWeightsTest(db_ids)

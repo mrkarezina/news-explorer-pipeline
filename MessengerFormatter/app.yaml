@@ -9,9 +9,9 @@
 
 runtime: python37
 
-service: wyzefind-api
+service: messenger-formatter
 
-instance_class: F2
+instance_class: F1
 
 # Handlers define how to route requests to your application.
 handlers:

@@ -28,10 +28,13 @@ def watson_enricher(text):
         url='https://gateway-wdc.watsonplatform.net/natural-language-understanding/api/v1/analyze?version=2018-03-19'
     )
 
+    # response = natural_language_understanding.analyze(
+    #     text=text,
+    #     features=Features(entities=EntitiesOptions(sentiment=True), concepts=ConceptsOptions(),
+    #                       categories=CategoriesOptions())).get_result()
     response = natural_language_understanding.analyze(
         text=text,
-        features=Features(entities=EntitiesOptions(sentiment=True), concepts=ConceptsOptions(),
-                          categories=CategoriesOptions())).get_result()
+        features=Features(entities=EntitiesOptions(sentiment=True), concepts=ConceptsOptions())).get_result()
 
     print(json.dumps(response, indent=2))
 
