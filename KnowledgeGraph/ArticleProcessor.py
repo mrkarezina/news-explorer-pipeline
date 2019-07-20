@@ -58,6 +58,7 @@ def fetch_article(url):
             'url': url,
         }
 
+
 def process_language(text):
     """
     Fetch from language processing API (cloud function)
