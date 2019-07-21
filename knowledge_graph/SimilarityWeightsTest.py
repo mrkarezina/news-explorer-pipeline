@@ -1,4 +1,4 @@
-from KnowledgeGraph.GraphIndexer import GraphIndexer
+from knowledge_graph.GraphIndexer import GraphIndexer
 
 
 class SimilarityWeightsTest(GraphIndexer):
@@ -19,13 +19,13 @@ class SimilarityWeightsTest(GraphIndexer):
                     CALL algo.louvain(
                     'MATCH (p:Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}}) RETURN id(p) as id',
                     'MATCH (p1:Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}})-[f:SIMILARITY {most_related:true}]-(p2:Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}})  RETURN id(p1) as source, id(p2) as target, f.weight as weight',
-                     {weightProperty:'weight', defaultValue:0.0, concurrency:4, graph:'cypher',write: true, writeProperty:"lpa"})
+                     {weightProperty:'weight', defaultValue:0.001, write: true, writeProperty:'lpa'})
                     """,
             "PAGE_RANK": """
             CALL algo.pageRank(
             'MATCH (p:Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}}) RETURN id(p) as id',
                     'MATCH (p1:Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}})-[f:SIMILARITY {most_related:true}]-(p2:Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}})  RETURN id(p1) as source, id(p2) as target, f.weight as weight',
-                    {graph:'cypher', weightProperty:"weight", iterations:5, write: true, writeProperty:"page_rank"}
+                    {graph:'cypher', weightProperty:'weight', iterations:5, write: true, writeProperty:"page_rank"}
             )
             """,
             "TEST_MOST_SIMILAR": """
@@ -72,7 +72,7 @@ class SimilarityWeightsTest(GraphIndexer):
 
     def create(self):
         """
-        Creates relations in the DB
+        Creates relations in the DB, creates relations for every article node
         :return:
         """
 
@@ -112,21 +112,14 @@ class SimilarityWeightsTest(GraphIndexer):
 
 
 if __name__ == "__main__":
-    """
-    MATCH (n:Article{cluster_id:"cnn"})-[r:SIMILARITY]-()
-    DELETE r
-    
-    MATCH (n:Article{cluster_id:"cnn"})
-    DELETE n.embedding
-    """
 
     db_ids = {
         'cluster_id': 1,
-        'user_id': "findhealthtips"
+        'user_id': "1"
     }
 
     s = SimilarityWeightsTest(db_ids)
-    s.create()
-    # s.run_graph_analysis()
+    # s.create()
+    s.run_graph_analysis()
 
-    # s.test_similarity()
+    s.test_similarity()

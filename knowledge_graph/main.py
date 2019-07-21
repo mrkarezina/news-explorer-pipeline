@@ -47,7 +47,7 @@ def process_article(request):
 
 
 # process_article({
-#     'url': 'https://www.findhealthtips.com/the-ab-belt-review/'
+#     'url': 'https://techcrunch.com/2019/07/21/lyft-e-bikes-san-francisco/'
 # })
 
 def load_articles(file):
@@ -67,4 +67,4 @@ def load_articles(file):
                 break
 
 
-load_articles('/Users/milanarezina/PycharmProjects/Wyzefind/KnowledgeGraph/Articles.txt')
+load_articles('/Users/milanarezina/PycharmProjects/Wyzefind/knowledge_graph/Articles.txt')

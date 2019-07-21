@@ -1,8 +1,12 @@
 import newspaper
 import json
+import os
 import re
 import requests
 import time
+
+
+
 
 
 class SitemapUtility:
@@ -218,6 +222,30 @@ class SitemapUtility:
         return False
 
 
+def prepare_article_dump(directory, save_file):
+        """
+        Walks the directory, loads all of the JSON files, and dumps all of them into a single JSON file.
+        :param directory:
+        :param save_file:
+        :return:
+        """
+
+        all = []
+
+        for file in os.listdir(directory):
+            if file not in ['.DS_Store']:
+                with open(directory + file) as f:
+                    content = json.load(f)
+                    print("Length {0}: {1}".format(file, len(content)))
+
+                all.extend(content)
+
+        print("Combined # documents: {0}".format(len(all)))
+        with open(save_file, "w+") as outfile:
+            json.dump(all, outfile)
+
+
+
 if __name__ == "__main__":
     sitemap_url = 'https://techcrunch.com/sitemap-97.xml'
 
@@ -225,12 +253,15 @@ if __name__ == "__main__":
 
     parse_sitemaps = False
 
-    articles_to_save = 10
+    articles_to_save = 15000
 
-    sitemap = SitemapUtility(sitemap_url, required_substrings, parse_sitemaps, articles_to_save)
+    # sitemap = SitemapUtility(sitemap_url, required_substrings, parse_sitemaps, articles_to_save)
 
-    links_save_file = "save-links.txt"
-    sitemap.save_parsed_links(links_save_file)
+    # links_save_file = "save-links.txt"
+    # sitemap.save_parsed_links(links_save_file)
 
-    # content_save_file = "test-utility.json"
+    # content_save_file = "/Users/milanarezina/PycharmProjects/Wyzefind/TechArticles/techcrunch8.json"
     # sitemap.save_scraped_links(content_save_file, timeout=0)
+
+    prepare_article_dump("/Users/milanarezina/PycharmProjects/Wyzefind/TechArticles/", "techcrunch_dump.json")
+
