@@ -18,7 +18,7 @@ class GraphIndexer:
         # Cosine similarity to add to prospective articles
         self.cosine_thresh = 0.4 * self.relation_values["doc2vec"]
 
-        self.num_related = 6
+        self.num_related = 3
 
         # TODO: Make use of the relevancy score
         # TODO: Delete unused properties

@@ -19,8 +19,9 @@ class SimilarityWeightsTest(GraphIndexer):
                     CALL algo.louvain(
                     'MATCH (p:Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}}) RETURN id(p) as id',
                     'MATCH (p1:Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}})-[f:SIMILARITY {most_related:true}]-(p2:Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}})  RETURN id(p1) as source, id(p2) as target, f.weight as weight',
-                     {weightProperty:'weight', defaultValue:0.001, write: true, writeProperty:'lpa'})
+                     {graph:'cypher', weightProperty:'weight', defaultValue:0.00001, write: true, writeProperty:'lpa'})
                     """,
+
             "PAGE_RANK": """
             CALL algo.pageRank(
             'MATCH (p:Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}}) RETURN id(p) as id',

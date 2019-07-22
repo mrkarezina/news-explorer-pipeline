@@ -8,7 +8,7 @@ CALL algo.louvain('MATCH (p:Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}})
 CREATE CONSTRAINT ON (a:Article) ASSERT a.title IS UNIQUE
 
 # Delete relations
-MATCH (n:Article{cluster_id:"cnn"})-[r:SIMILARITY]-()
+MATCH (n:Article{cluster_id:"techcrunch"})-[r:SIMILARITY]-()
 DELETE r
 
 # Delete embedding property
