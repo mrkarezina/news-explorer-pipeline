@@ -1,4 +1,8 @@
 venv/
 .idea
-Articles.txt
+articles.txt
 service_account.json
+secrets.py
+__cache__
+*.pyc
+env

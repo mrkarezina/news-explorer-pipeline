@@ -1,23 +1,17 @@
-from GraphInsertion import ArticleInserter
-from ArticleProcessor import article_processor
+from knowledge_graph.GraphInsertion import ArticleInserter
+from knowledge_graph.ArticleProcessor import article_processor
 from neo4j.exceptions import ConstraintError
 from py2neo import ClientError
 import time
 
-# TODO: change in index / insert files
-# graph_url = "http://neo4j:Trebinje66@35.202.226.197:7474/db/data/"
-graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
+from knowledge_graph.config import DB_IDS, TIMEOUT, MAX_ARTICLES
 
 # Becuase of weird connection to Neo4j
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-db_ids = {
-    'cluster_id': 1,
-    'user_id': "1"
-}
-article_inserter = ArticleInserter(db_ids)
+article_inserter = ArticleInserter(DB_IDS)
 
 
 def process_article(request):
@@ -43,7 +37,7 @@ def process_article(request):
         except (ConstraintError, ClientError):
             return 'Article already Exists in graph'
 
-    time.sleep(3)
+    time.sleep(TIMEOUT)
 
 
 # process_article({
@@ -59,7 +53,7 @@ def load_articles(file):
 
     with open(file, 'r') as urls:
         for i, url in enumerate(urls):
-            if i < 3330:
+            if i < MAX_ARTICLES:
                 process_article({
                     'url': url.rstrip()
                 })
@@ -67,4 +61,4 @@ def load_articles(file):
                 break
 
 
-load_articles('/Users/milanarezina/PycharmProjects/Wyzefind/knowledge_graph/Articles.txt')
+load_articles('/Users/milanarezina/PycharmProjects/Wyzefind/knowledge_graph/articles.txt')

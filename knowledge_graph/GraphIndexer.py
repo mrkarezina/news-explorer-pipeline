@@ -1,7 +1,7 @@
 from py2neo import Graph
 
-# graph_url = "http://neo4j:Trebinje66@35.202.226.197:7474/db/data/"
-graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
+from knowledge_graph.config import GRAPH_URL
+
 
 class GraphIndexer:
     """
@@ -11,7 +11,7 @@ class GraphIndexer:
 
     def __init__(self, db_ids):
 
-        self.graph = Graph(graph_url)
+        self.graph = Graph(GRAPH_URL)
 
         self.relation_values = {"doc2vec": 0.25, "concept": 0.35, "entity": 0.40, "entity_category": 0.25}
 
@@ -34,7 +34,8 @@ class GraphIndexer:
             # TODO: {ENTITY_WEIGHT}*overlap_ent/(a.total_entity + 1) + ({ENT not working
 
             # Used set totals as property to prevent recomputing
-            # If this is used article by article, when comuting bidirectional relation will fail silently if other article not having totals property
+            # If this is used article by article, when computing bidirectional relation will fail silently if other
+            # article not having totals property
             "SET_PROPERTIES_COUNT": """
                                     MATCH (a: Article{cluster_id:{CLUSTER_ID}, user_id:{USER_ID}, title:{TITLE}})
                                     WHERE not exists(a.total_entity)
@@ -50,7 +51,6 @@ class GraphIndexer:
                                     SET a.total_category = cat
                                     SET a.total_concept = con
                                     """,
-
 
             # Creates semantic weight based on common concepts, entities, and entity categories
             "CREATE_SEMANTIC_RELATIONS": """
@@ -149,8 +149,12 @@ class GraphIndexer:
     def _set_sim_weight(self, title, bidirectional=False):
 
         # Get prospective articles with matching, entity, category
-        prospective_articles = list(self.graph.run(self.queries_dict["MATCH_PROSPECTIVE_ARTICLES"], TITLE=title))[0]['titles']
-        cosine_prospective = list(self.graph.run(self.queries_dict["MATCH_COSINE_ARTICLES"], TITLE=title, COSINE_THRESH= self.cosine_thresh))[0]['titles']
+        prospective_articles = list(self.graph.run(self.queries_dict["MATCH_PROSPECTIVE_ARTICLES"], TITLE=title))[0][
+            'titles']
+        cosine_prospective = \
+            list(self.graph.run(self.queries_dict["MATCH_COSINE_ARTICLES"], TITLE=title,
+                                COSINE_THRESH=self.cosine_thresh))[
+                0]['titles']
 
         prospective_articles = set(cosine_prospective + prospective_articles)
         print("Prospective Articles: {0}".format(len(prospective_articles)))

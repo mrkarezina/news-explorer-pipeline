@@ -3,14 +3,15 @@ from watson_developer_cloud import NaturalLanguageUnderstandingV1
 from watson_developer_cloud.natural_language_understanding_v1 import Features, EntitiesOptions, CategoriesOptions, \
     ConceptsOptions
 
+from knowledge_graph.config import IBM_WATSON_API_KEY
 
 """
-10000 NLU units a month free
+10000 NLU units a month are included in the IBM free tier
 
 10000 characters is one data unit
 NLU units = data units * number features
-
 """
+
 
 def watson_enricher(text):
     """
@@ -24,7 +25,7 @@ def watson_enricher(text):
 
     natural_language_understanding = NaturalLanguageUnderstandingV1(
         version='2018-11-16',
-        iam_apikey='20cMYNyna85jQb4zYUn68el7s_ur4N9XZEYreXgCFPru',
+        iam_apikey=IBM_WATSON_API_KEY,
         url='https://gateway-wdc.watsonplatform.net/natural-language-understanding/api/v1/analyze?version=2018-03-19'
     )
 

@@ -1,10 +1,10 @@
-from ArticleDownloader import Article
+from knowledge_graph.ArticleDownloader import Article
 import newspaper
 import requests
-from WatsonEnrichment import watson_enricher
+from knowledge_graph.WatsonEnrichment import watson_enricher
 
 # Tech processor: language-processor
-language_processor_api = 'https://us-central1-graph-intelligence.cloudfunctions.net/language-processor-tech'
+from knowledge_graph.config import LANGUAGE_PROCESSOR_API
 
 # If less than 100 tokens retry parsing the article not cleaning dom
 retry_article_parse_tokens = 100
@@ -71,7 +71,7 @@ def process_language(text):
         'text': text.encode("ascii", errors="ignore").decode()
     }
 
-    response = requests.post(language_processor_api,
+    response = requests.post(LANGUAGE_PROCESSOR_API,
                              json=request)
 
     return response.json()

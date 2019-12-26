@@ -1,7 +1,7 @@
 from py2neo import Graph
 
-# graph_url = "http://neo4j:Trebinje66@35.202.226.197:7474/db/data/"
-graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
+from knowledge_graph.config import GRAPH_URL
+
 
 class ArticleInserter:
     """
@@ -10,7 +10,7 @@ class ArticleInserter:
 
     def __init__(self, db_ids):
 
-        self.graph = Graph(graph_url)
+        self.graph = Graph(GRAPH_URL)
 
         # Minimum entities mentioned in summary
         self.minimum_entities = 0

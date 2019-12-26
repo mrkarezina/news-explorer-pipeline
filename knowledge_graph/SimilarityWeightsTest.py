@@ -1,10 +1,11 @@
 from knowledge_graph.GraphIndexer import GraphIndexer
+from knowledge_graph.config import DB_IDS
 
 
 class SimilarityWeightsTest(GraphIndexer):
     """
-    Used to test the relations
     Used to create the relations (calls the insert for every article)
+    Used to test the relations
     """
 
     def __init__(self, db_ids):
@@ -113,14 +114,12 @@ class SimilarityWeightsTest(GraphIndexer):
 
 
 if __name__ == "__main__":
-
-    db_ids = {
-        'cluster_id': 1,
-        'user_id': "1"
-    }
-
-    s = SimilarityWeightsTest(db_ids)
-    # s.create()
+    s = SimilarityWeightsTest(DB_IDS)
+    # Creates the weighted graph
+    s.create()
+    # Runs page rank and community detection algorithms on the graph
     s.run_graph_analysis()
 
+    # Output the result of running the similarity analysis
+    # showing the top related articles
     s.test_similarity()

@@ -5,6 +5,7 @@ from newspaper.cleaners import DocumentCleaner
 from newspaper.outputformatters import OutputFormatter
 from newspaper.videos.extractors import VideoExtractor
 
+
 class Cleaner(DocumentCleaner):
     """
     Extended DocumentCleaner, to skip removing "naughty" dom tags
@@ -114,7 +115,6 @@ class Article(nArticle):
             self.url,
             self.clean_doc)
 
-
         if clean_doc:
             document_cleaner = DocumentCleaner(self.config)
             # Before any computations on the body, clean DOM object
@@ -124,7 +124,6 @@ class Article(nArticle):
             document_cleaner = Cleaner(self.config)
             # Before any computations on the body, clean DOM object
             self.doc = document_cleaner.clean(self.doc)
-
 
         self.top_node = self.extractor.calculate_best_node(self.doc)
         if self.top_node is not None:
