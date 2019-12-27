@@ -1,11 +1,10 @@
-
 from py2neo import Graph
 
 # TODO: Make import script for configuring the database, including title index
 
 
-graph_url = "http://neo4j:Trebinje66@35.192.221.56:7474/db/data/"
-# graph_url = "http://neo4j:Trebinje66@localhost:7474/db/data/"
+graph_url = "http://neo4j:Heqej21@35.192.221.56:7474/db/data/"
+# graph_url = "http://neo4j:Heqej21@localhost:7474/db/data/"
 
 """
 Importing exporting databases using GraphML: https://medium.com/@niazangels/export-and-import-your-neo4j-graph-easily-with-apoc-4ea614f7cbdf
@@ -19,7 +18,6 @@ Can import the graph from a google drive URL:
 -Make sure you use a download link
 https://docs.google.com/uc?export=download&id=[Your id]
 """
-
 
 # Call to set the label properties:
 """
@@ -36,7 +34,7 @@ CALL apoc.import.graphml('https://docs.google.com/uc?export=download&id=1LGyA-nz
 """
 
 # To set relations
-#TODO: make script that can be run at once, run each of these independently, or memory error
+# TODO: make script that can be run at once, run each of these independently, or memory error
 """
 MATCH (n)
 WHERE n.node_label=['Article']
@@ -59,11 +57,7 @@ WHERE n.node_label=['Topic']
 SET n :Topic
 """
 
-
 graph = Graph(graph_url)
 
 print('Loading...')
 graph.run(load_query)
-
-
-

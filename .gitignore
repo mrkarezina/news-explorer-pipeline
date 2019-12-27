@@ -4,5 +4,6 @@ articles.txt
 service_account.json
 secrets.py
 __cache__
+__pycache__
 *.pyc
 env

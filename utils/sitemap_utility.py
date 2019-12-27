@@ -6,9 +6,6 @@ import requests
 import time
 
 
-
-
-
 class SitemapUtility:
     """
     Takes a site map and parses all the links.
@@ -223,27 +220,26 @@ class SitemapUtility:
 
 
 def prepare_article_dump(directory, save_file):
-        """
-        Walks the directory, loads all of the JSON files, and dumps all of them into a single JSON file.
-        :param directory:
-        :param save_file:
-        :return:
-        """
+    """
+    Walks the directory, loads all of the JSON files, and dumps all of them into a single JSON file.
+    :param directory:
+    :param save_file:
+    :return:
+    """
 
-        all = []
+    all = []
 
-        for file in os.listdir(directory):
-            if file not in ['.DS_Store']:
-                with open(directory + file) as f:
-                    content = json.load(f)
-                    print("Length {0}: {1}".format(file, len(content)))
+    for file in os.listdir(directory):
+        if file not in ['.DS_Store']:
+            with open(directory + file) as f:
+                content = json.load(f)
+                print("Length {0}: {1}".format(file, len(content)))
 
-                all.extend(content)
+            all.extend(content)
 
-        print("Combined # documents: {0}".format(len(all)))
-        with open(save_file, "w+") as outfile:
-            json.dump(all, outfile)
-
+    print("Combined # documents: {0}".format(len(all)))
+    with open(save_file, "w+") as outfile:
+        json.dump(all, outfile)
 
 
 if __name__ == "__main__":
@@ -264,4 +260,3 @@ if __name__ == "__main__":
     # sitemap.save_scraped_links(content_save_file, timeout=0)
 
     prepare_article_dump("/Users/milanarezina/PycharmProjects/Wyzefind/TechArticles/", "techcrunch_dump.json")
-

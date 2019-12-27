@@ -33,4 +33,18 @@ The edges between articles and their respective meta data will contain informati
 towards entities as well as relevance scores for topics and entities.
 
 
+## Utils
+
+**GraphML.py**: Is used for importing an existing database exported in graph ML format
+
+
+**LoadRssFeeds.py**: Used to load RSS feeds into the database where a cron job keeps the latest
+articles cached. Mostly used by the [article_curation](https://github.com/mrkarezina/content-recommendation-api) api.
+
+
+**SitemapUtility.py**: Used to scrape and download all of the articles from RSS feeds. Useful in creating a corpora to train a Doc2Vec model.
+
+
+**VisjsFormatter.py**: Formats and exports the knowledge graph in the Neo4j database in a format compatible with the [vis.js](https://visjs.org/) library. Used in the [web app](https://graphs.markoarezina.com/).
+
 

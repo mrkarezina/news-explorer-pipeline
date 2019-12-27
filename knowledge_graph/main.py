@@ -1,5 +1,5 @@
-from knowledge_graph.GraphInsertion import ArticleInserter
-from knowledge_graph.ArticleProcessor import article_processor
+from knowledge_graph.graph_insertion import ArticleInserter
+from knowledge_graph.article_processor import article_processor
 from neo4j.exceptions import ConstraintError
 from py2neo import ClientError
 import time

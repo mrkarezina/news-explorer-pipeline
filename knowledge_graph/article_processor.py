@@ -1,7 +1,7 @@
-from knowledge_graph.ArticleDownloader import Article
+from knowledge_graph.article_downloader import Article
 import newspaper
 import requests
-from knowledge_graph.WatsonEnrichment import watson_enricher
+from knowledge_graph.watson_enrichment import watson_enricher
 
 # Tech processor: language-processor
 from knowledge_graph.config import LANGUAGE_PROCESSOR_API

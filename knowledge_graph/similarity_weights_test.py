@@ -1,4 +1,4 @@
-from knowledge_graph.GraphIndexer import GraphIndexer
+from knowledge_graph.graph_indexer import GraphIndexer
 from knowledge_graph.config import DB_IDS
 
 

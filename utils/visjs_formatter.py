@@ -84,7 +84,6 @@ class GraphViz:
                 "date": unique_art["date"]
             })
 
-
         # For response to be in same format as gCloud
         graph_json_formated = [graph_json_formated]
 
