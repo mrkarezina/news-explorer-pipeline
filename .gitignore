@@ -3,6 +3,9 @@ venv/
 articles.txt
 service_account.json
 secrets.py
+aclImdb_v1.tar.gz
+harvard_articles.json
+
 __cache__
 __pycache__
 *.pyc

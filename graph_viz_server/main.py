@@ -49,4 +49,4 @@ def after_request(response):
 if __name__ == '__main__':
     # Test: http://127.0.0.1:5000/demo?data_set=cnn
 
-    app.run()
+    app.run(debug=True)
