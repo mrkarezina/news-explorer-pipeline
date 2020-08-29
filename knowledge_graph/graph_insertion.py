@@ -1,3 +1,4 @@
+import py2neo
 from py2neo import Graph
 
 from knowledge_graph.config import GRAPH_URL
@@ -46,9 +47,7 @@ class ArticleInserter:
             
             MERGE (article)-[r:HAS_TOPIC]->(topic)
             SET r.score = {RELEVANCE_SCORE}
-            """
-
-            ,
+            """,
 
             "ARTICLE_CONCEPTS": """
             MATCH(article:Article {cluster_id:{CLUSTER_ID}, user_id:{USER_ID}, title:{TITLE}})
@@ -65,7 +64,10 @@ class ArticleInserter:
         CREATE CONSTRAINT ON (a:Article) ASSERT a.title IS UNIQUE
         """
 
-        self.create_unique_title_constraint()
+        try:
+            self.create_unique_title_constraint()
+        except py2neo.database.work.ClientError:
+            print("Neo4j unique title contrainst already exists, skipping.")
 
         self.format_queries(db_ids)
 
@@ -95,7 +97,7 @@ class ArticleInserter:
 
         self.graph.run(self.CREATE_UNIQUE_CONSTRAINT)
 
-    def db_insert(self, article_dict, watson_entities, insert_topics):
+    def db_insert(self, article_dict):
         """
         Inserts the extracted information into the knowledge graph
         :param article_dict:
@@ -109,29 +111,3 @@ class ArticleInserter:
                        TEXT=article_dict['summary'], URL=article_dict['url'],
                        IMG_URL=article_dict['img_url'], DATE=article_dict['date'],
                        EMBEDDING=article_dict['embedding'])
-
-        for entity in watson_entities['entities']:
-
-            if entity['type'] != 'Quantity':
-                try:
-                    entity_categories = entity['disambiguation']['subtype']
-                except KeyError:
-                    entity_categories = []
-
-                self.graph.run(self.queries_dict["RELATED_ENTITY_INSERTION_QUERY"],
-                               TITLE=article_dict['title'],
-                               ENTITY_LABEL=entity['text'], ENTITY_TYPE=entity['type'], COUNT=entity['count'],
-                               SENTIMENT=entity['sentiment']['label'],
-                               RELEVANCE=entity['relevance'],
-                               ENTITY_CATEGORIES=entity_categories)
-
-            for category in watson_entities['concepts']:
-                self.graph.run(self.queries_dict["ARTICLE_CONCEPTS"],
-                               TITLE=article_dict['title'],
-                               CONCEPT_LABEL=category['text'], RELEVANCE_SCORE=category['relevance'])
-
-            if insert_topics:
-                for topic in watson_entities['categories']:
-                    self.graph.run(self.queries_dict["ARTICLE_TOPICS"],
-                                   TITLE=article_dict['title'],
-                                   TOPIC_LABEL=topic['label'], RELEVANCE_SCORE=topic['score'])

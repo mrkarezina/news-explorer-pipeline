@@ -1,7 +1,6 @@
 from knowledge_graph.article_downloader import Article
 import newspaper
 import requests
-from knowledge_graph.watson_enrichment import watson_enricher
 
 # Tech processor: language-processor
 from knowledge_graph.config import LANGUAGE_PROCESSOR_API
@@ -74,6 +73,8 @@ def process_language(text):
     response = requests.post(LANGUAGE_PROCESSOR_API,
                              json=request)
 
+    print(response)
+
     return response.json()
 
 
@@ -94,7 +95,6 @@ def article_processor(url):
         if len(article_dict['text'].split()) > 100:
 
             processed_language = process_language(article_dict['text'])
-            enriched_knowledge = watson_enricher(article_dict['text'])
 
             article_dict['summary'] = processed_language['summary']
             article_dict['embedding'] = processed_language['embedding']
@@ -102,11 +102,11 @@ def article_processor(url):
             print('To short article, lenght: {0}'.format(len(article_dict['text'].split())))
             is_valid = False
 
-    except Exception as e:
+    except KeyError as e:
         print(e)
         is_valid = False
 
     if not is_valid:
         print("Failed processing URL: {0}".format(url))
 
-    return article_dict, enriched_knowledge, is_valid
+    return article_dict, is_valid
