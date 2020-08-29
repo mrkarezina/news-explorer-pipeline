@@ -1,10 +1,9 @@
-venv/
-.idea
+venv
+articles
 articles.txt
-service_account.json
 secrets.py
-aclImdb_v1.tar.gz
-harvard_articles.json
+service_account.json
+.vscode
 
 __cache__
 __pycache__
