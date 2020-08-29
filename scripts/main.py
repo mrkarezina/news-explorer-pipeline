@@ -23,19 +23,17 @@ def process_article(request):
     except KeyError:
         return 'Bad params'
 
-    article_dict, watson_entities, is_valid = article_processor(url=url)
+    article_dict, is_valid = article_processor(url=url)
 
     print(article_dict)
 
-    if watson_entities == {}:
-        is_valid = False
-        print('Not inserted')
-
     if is_valid:
         try:
-            article_inserter.db_insert(article_dict, watson_entities, insert_topics=True)
+            article_inserter.db_insert(article_dict)
         except (ConstraintError, ClientError):
             return 'Article already Exists in graph'
+    else:
+        print()
 
     time.sleep(TIMEOUT)
 
@@ -61,4 +59,4 @@ def load_articles(file):
                 break
 
 
-load_articles('/Users/milanarezina/PycharmProjects/Wyzefind/knowledge_graph/articles.txt')
+load_articles('articles/cnn_links.txt')
