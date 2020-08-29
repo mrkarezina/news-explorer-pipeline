@@ -18,46 +18,9 @@ class ArticleInserter:
 
         # Creates relation between entity and its categories
         self.queries_dict = {
-
             "CREATE_ARTICLE": """
-                        MERGE(article:Article {cluster_id:{CLUSTER_ID}, user_id:{USER_ID}, title:{TITLE}, summary:{TEXT}, url:{URL}, img_url:{IMG_URL}, date:{DATE}, embedding:{EMBEDDING}})
-                        """,
-
-            "RELATED_ENTITY_INSERTION_QUERY": """
-                MATCH(article:Article {cluster_id:{CLUSTER_ID}, user_id:{USER_ID}, title:{TITLE}})
-
-                MERGE (entity:Entity {label: {ENTITY_LABEL}})
-
-                MERGE (article)-[r:RELATED_ENTITY]->(entity)
-                SET r.type = {ENTITY_TYPE}
-                SET r.count = {COUNT}
-                SET r.score = {RELEVANCE}
-                SET r.sentiment = {SENTIMENT}
-
-                FOREACH (category IN {ENTITY_CATEGORIES} |
-                    MERGE (cat:Category {label: category})
-                    MERGE (entity)-[:IN_CATEGORY]->(cat)
-                )
-                """,
-
-            "ARTICLE_TOPICS": """
-            MATCH(article:Article {cluster_id:{CLUSTER_ID}, user_id:{USER_ID}, title:{TITLE}})
-            
-            MERGE (topic:Topic {label: {TOPIC_LABEL}})
-            
-            MERGE (article)-[r:HAS_TOPIC]->(topic)
-            SET r.score = {RELEVANCE_SCORE}
-            """,
-
-            "ARTICLE_CONCEPTS": """
-            MATCH(article:Article {cluster_id:{CLUSTER_ID}, user_id:{USER_ID}, title:{TITLE}})
-            
-            MERGE (concept:Concept {label: {CONCEPT_LABEL}})
-            
-            MERGE (article)-[r:MENTIONS_CONCEPT]->(concept)
-            SET r.score = {RELEVANCE_SCORE}
-            """
-
+                        MERGE(article:Article {cluster_id:$CLUSTER_ID, user_id:$USER_ID, title:$TITLE, summary:$TEXT, url:$URL, img_url:$IMG_URL, date:$DATE, embedding:$EMBEDDING})
+                        """
         }
 
         self.CREATE_UNIQUE_CONSTRAINT = """
@@ -84,8 +47,8 @@ class ArticleInserter:
         # Replace for actual ids
         for query in self.queries_dict.keys():
             q = self.queries_dict[query]
-            q = q.replace("{CLUSTER_ID}", "\"{0}\"".format(cluster_id))
-            q = q.replace("{USER_ID}", "\"{0}\"".format(user_id))
+            q = q.replace("$CLUSTER_ID", "\"{0}\"".format(cluster_id))
+            q = q.replace("$USER_ID", "\"{0}\"".format(user_id))
 
             self.queries_dict[query] = q
 
