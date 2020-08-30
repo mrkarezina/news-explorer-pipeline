@@ -1,9 +1,11 @@
+# Tech processor: language-processor
+from knowledge_graph.language_processor.main import process_language as processor
 from knowledge_graph.article_downloader import Article
+from knowledge_graph.config import LANGUAGE_PROCESSOR_API
+
 import newspaper
 import requests
 
-# Tech processor: language-processor
-from knowledge_graph.config import LANGUAGE_PROCESSOR_API
 
 # If less than 100 tokens retry parsing the article not cleaning dom
 retry_article_parse_tokens = 100
@@ -70,12 +72,11 @@ def process_language(text):
         'text': text.encode("ascii", errors="ignore").decode()
     }
 
-    response = requests.post(LANGUAGE_PROCESSOR_API,
-                             json=request)
-
-    print(response)
-
-    return response.json()
+    response = processor(request)
+    if type(response) is str:
+        print(f"Language processing error {response}")
+        response = {}
+    return response
 
 
 def article_processor(url):
@@ -89,24 +90,19 @@ def article_processor(url):
     is_valid = True
 
     article_dict = fetch_article(url)
-    enriched_knowledge = {}
 
     try:
         if len(article_dict['text'].split()) > 100:
-
             processed_language = process_language(article_dict['text'])
-
             article_dict['summary'] = processed_language['summary']
             article_dict['embedding'] = processed_language['embedding']
         else:
-            print('To short article, lenght: {0}'.format(len(article_dict['text'].split())))
+            print('To short article, lenght: {0}'.format(
+                len(article_dict['text'].split())))
             is_valid = False
 
     except KeyError as e:
         print(e)
         is_valid = False
-
-    if not is_valid:
-        print("Failed processing URL: {0}".format(url))
 
     return article_dict, is_valid
