@@ -25,15 +25,14 @@ def process_article(request):
 
     article_dict, is_valid = article_processor(url=url)
 
-    print(article_dict)
-
+    title = article_dict["title"]
     if is_valid:
         try:
             article_inserter.db_insert(article_dict)
         except (ConstraintError, ClientError):
-            return 'Article already Exists in graph'
+            print(f"Error inserting article into DB: {title}")
     else:
-        print()
+        print(f"Article is not valid: {title}.")
 
     time.sleep(TIMEOUT)
 
