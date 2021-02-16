@@ -34,7 +34,7 @@ def save_sitemap_links(sitemap, substrings, file):
     save_parsed_links(site_map_links, file)
     
 
-substrings = ["cnn.com/2020/08/29", "cnn.com/2020/08/28"]
-xml_sitemap_link = "https://www.cnn.com/article/sitemap-2020-8.html"
-save_file = "articles/cnn_links.txt"
+substrings = ["2021/01/2"]
+xml_sitemap_link = "https://techcrunch.com/sitemap-105.xml"
+save_file = "techcrunch_links.txt"
 save_sitemap_links(xml_sitemap_link, substrings, save_file)

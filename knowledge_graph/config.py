@@ -4,7 +4,7 @@ from knowledge_graph.secrets import NEO4J_CONNECTION_STRING
 GRAPH_URL = NEO4J_CONNECTION_STRING
 
 # URL of language processor API
-LANGUAGE_PROCESSOR_API = "https://us-central1-graph-intelligence.cloudfunctions.net/language-processor-health "
+LANGUAGE_PROCESSOR_API = "https://us-central1-graph-intelligence.cloudfunctions.net/language-processor-tech"
 
 # Timeout between inserting articles in seconds
 TIMEOUT = 1
@@ -15,5 +15,5 @@ MAX_ARTICLES = 300
 # Specifies the cluster of articles in the knowledge graph
 DB_IDS = {
     'cluster_id': 1,
-    'user_id': "cnn"
+    'user_id': "techcrunch"
 }

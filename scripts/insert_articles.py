@@ -58,4 +58,4 @@ def load_articles(file):
                 break
 
 
-load_articles('cnn_links.txt')
+load_articles('techcrunch_links.txt')
