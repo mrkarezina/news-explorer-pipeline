@@ -1,5 +1,3 @@
-# Tech processor: language-processor
-from knowledge_graph.language_processor.main import process_language as processor
 from knowledge_graph.article_downloader import Article
 from knowledge_graph.config import LANGUAGE_PROCESSOR_API
 
@@ -72,7 +70,7 @@ def process_language(text):
         'text': text.encode("ascii", errors="ignore").decode()
     }
 
-    response = processor(request)
+    response = requests.post(LANGUAGE_PROCESSOR_API, request)
     if type(response) is str:
         print(f"Language processing error {response}")
         response = {}

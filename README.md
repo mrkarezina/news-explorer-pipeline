@@ -2,21 +2,39 @@
 
 These scripts are used to download, preprocess, and insert articles into the knowledge graph. The [language processor endpoint](https://github.com/mrkarezina/graph-recommendation-api) is used to process the raw text and generate the Doc2Vec embeddings.
 
-## Usage
-1. Using `utils/save_article_links.py` create a text file `knowledge_graph/articles.txt` containing all of the urls of the articles to be inserted into the knowledge graph with urls separated by newline.
 
-2. Populate a variable in `knowledge_graph/secrets.py` containing your graph DB connection string. Example
-```
-NEO4J_CONNECTION_STRING = http://neo4j:PASSWORD@35.111.11.111:7474/db/data/
-```
+## Build Knowledge Graph
+0. Setup Python environment
+    ```
+    python -m venv venv
+    pip install -r requirments.txt
+    ```
 
-3. Similarly populate `IBM_WATSON_API_KEY` which is the api key used for the IBM Watson NLU service. Adjust the config in `knowledge_graph/config.py` including the timeout between inserted articles and number of articles to insert.
+1. Create the file `knowledge_graph/secrets.py` and insert a variable containing your graph DB connection string.
+    ```
+    NEO4J_CONNECTION_STRING = http://neo4j:PASSWORD@35.111.11.111:7474/db/data/
+    ```
 
-4. Run `knowledge_graph/main.py` to process the articles and insert the extracted data into
+2. Similarly populate `IBM_WATSON_API_KEY` which is the api key used for the IBM Watson NLU service. Next, configure `knowledge_graph/config.py` including the timeout between inserted articles and number of articles to insert.
+
+3. Create a text file `articles.txt` containing all of the urls of the articles to be inserted into the knowledge graph with urls separated by newline.
+    ```
+    python -m utils.save_article_links --source cnn --date '2020/08/29'
+    ```
+
+4. Process the articles and insert the extracted data into
 the knowledge graph.
-
-
-5. Run `knowledge_graph/similarity_weights_test.py` to analyze the relations between the articles creating the weighted graph. Sample relations will be outputted when the relations are tested.
+    ```
+    python -m scripts.insert_articles
+    ```
+5. Index the articles inserted into the knowledge graph and construct weighted graph.
+    ```
+    python -m scripts.index_article_graph
+    ```
+6. Analyze the relations between the articles creating the weighted graph. Sample relations will be outputted when the relations are tested.
+    ```
+    python -m scripts.run_graph_analysis
+    ```
 
 The neo4j database should now contain the knowledge graph with the nodes representing the analyzed articles as well as nodes for all of their meta data, ie entities, topics, and concepts mentioned.
 
@@ -37,7 +55,7 @@ Loads RSS feeds into the database where a cron job keeps the latest articles cac
 ## `sitemap_utility.py`
 Scrapes and downloads all of the articles from RSS feeds. Useful in creating a corpora to train a Doc2Vec model.
 
-## `export_neo4j_visjs.py`
-Formats and exports the knowledge graph in the Neo4j database in a format compatible with the [vis.js](https://visjs.org/) library. Used in the [web app](https://graphs.markoarezina.com/).
+## `run_visjs_server.py`
+Formats and exports the knowledge graph in the Neo4j database in a format compatible with the [vis.js](https://visjs.org/) library. Exposes endpoint to query vis.js formatted data for local development of [web app](https://graphs.markoarezina.com/).
 
 
