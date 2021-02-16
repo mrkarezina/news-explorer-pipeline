@@ -56,6 +56,8 @@ def fetch_article(url):
             'img_url': img,
             'url': url,
         }
+    else:
+        return {}
 
 
 def process_language(text):
@@ -67,14 +69,15 @@ def process_language(text):
 
     # The language processing seems to fail without acsii decoding, ie remove emoji and chinese characters
     request = {
-        'text': text.encode("ascii", errors="ignore").decode()
+        "text": text.encode("ascii", errors="ignore").decode()
     }
 
-    response = requests.post(LANGUAGE_PROCESSOR_API, request)
-    if type(response) is str:
+    response = requests.post(LANGUAGE_PROCESSOR_API, json=request)
+    if response.status_code == 500:
         print(f"Language processing error {response}")
-        response = {}
-    return response
+        return {}
+    else:
+        return response.json()
 
 
 def article_processor(url):
