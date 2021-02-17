@@ -27,13 +27,9 @@ the knowledge graph.
     ```
     python -m scripts.insert_articles
     ```
-5. Index the articles inserted into the knowledge graph and construct weighted graph.
+5. Index the articles inserted into the knowledge graph and construct weighted graph. Analyze the relations between the articles creating the weighted graph. Sample relations will be outputted when the relations are tested.
     ```
     python -m scripts.index_article_graph
-    ```
-6. Analyze the relations between the articles creating the weighted graph. Sample relations will be outputted when the relations are tested.
-    ```
-    python -m scripts.run_graph_analysis
     ```
 
 The neo4j database should now contain the knowledge graph with the nodes representing the analyzed articles as well as nodes for all of their meta data, ie entities, topics, and concepts mentioned.
